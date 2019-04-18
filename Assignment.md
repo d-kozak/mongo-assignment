@@ -17,7 +17,7 @@ This id was used in the first task of creating a lookup table.
 
 ## 1) Lookup table
 
-First create the other tables
+First create the lookup table
 ```js
 db.reviews.aggregate(
     [
@@ -63,6 +63,9 @@ db.reviews.aggregate(
                         $arrayElemAt: ["$others.id", 0] // others is an array, therefore the arrayElemAt is used
                     }
                 }
+        },
+        {
+                    $out: "reviews2" // save into new collection, just to be save
         }
     ]
 )

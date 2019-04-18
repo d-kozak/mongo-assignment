@@ -1,5 +1,5 @@
 /**
- * Lookup table
+ * Lookup table task
  */
 db.reviews.aggregate(
     [
@@ -44,6 +44,9 @@ db.reviews.aggregate(
                         $arrayElemAt: ["$others.id", 0] // others is an array, therefore the arrayElemAt is used
                     }
                 }
+        },
+        {
+            $out: "reviews2" // save into new collection, just to be save
         }
     ]
 )
