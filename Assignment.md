@@ -126,3 +126,57 @@ db.reviews.aggregate(
 db.probReviews.aggregate( [ {$group:{ "_id":"name",total: { $sum : "$probability"  }  }}])
 ```
 
+## 11) Fill missing values
+First generate some nulls, since there were not any
+```js
+db.reviews.aggregate(
+    [
+        {
+            $addFields: {
+                "overall-ratings": {
+                    $cond: [{$mod: ["$id", 5]}, "$overall-ratings", null] // every fifth review will have null as overall-ratings
+                }
+            }
+        },
+        {
+            $out: "nulledReviews"
+        }
+    ]
+);
+```
+count the average overall rating
+```js
+db.reviews.aggregate(
+    [
+        {
+            $group: {
+                "_id": null, average:
+                    {
+                        $avg: "$overall-ratings"
+                    }
+            }
+        },
+        {
+            $out: "averageRating"
+        }
+    ]
+);
+```
+// extract it
+```js
+const average = db.averageRating.findOne().average;
+```
+Finally insert the average value where the overall-ratings is null
+```js
+db.nulledReviews.aggregate(
+    [
+        {
+            $addFields:
+                {"overall-ratings": {$ifNull: ["$overall-ratings", average]}}
+        },
+        {
+            $out: "notNullReviews"
+        }
+    ]
+);
+```
