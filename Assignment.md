@@ -71,3 +71,32 @@ db.reviews.aggregate(
 )
 ```
 
+
+## 4) Discretizing
+For the discretizing tasks I decided to convert the dates property. In the original collection, it contains dates in string format.
+Since for reviews their date is very important, I decided to discretize this column into values from the set {"CURRENT","OLD},
+where all the reviews that are older than 1.1.2017 are considered old.
+```js
+db.reviews.aggregate([{
+        $addFields: {
+            dates: {
+                $dateFromString: {
+                    dateString: "$dates", // convert to date object
+                    onError: new Date() // use very old date on error
+                }
+            }
+        }
+    }, {
+        $addFields: {
+            dates: {
+                $cond: [{$gte: ["$dates", ISODate("2017-01-01")]}, "CURRENT", "OLD"] // split into two categories
+            }
+        }
+    },
+        {
+            $out: "modifiedReviews"
+        }
+    ]
+);
+```
+
