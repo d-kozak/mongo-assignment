@@ -11,9 +11,6 @@ db.reviews.aggregate([
                 $sum: 1
             }
         }
-    },
-    {
-        $out: "companyCount"
     }
 ]);
 

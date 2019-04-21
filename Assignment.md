@@ -84,9 +84,6 @@ db.reviews.aggregate([
                 $sum: 1
             }
         }
-    },
-    {
-        $out: "companyCount"
     }
 ]);
 ```
@@ -114,10 +111,6 @@ const google = {
 const microsoft = {
     name: "microsoft",
     reviewCount: 17930,
-};
-const amazon = {
-    name: "amazon",
-    reviewCount: 26430,
 };
 const facebook = {
     name: "facebook",
