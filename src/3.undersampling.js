@@ -6,11 +6,25 @@ use reviews;
 //     { "_id" : "facebook", "count" : 1590 }
 //     { "_id" : "netflix", "count" : 810 }
 
-
-const min = "810";
-
 db.undersampled.deleteMany({});
 
-for (let name of ["apple", "google", "microsoft", "amazon", "facebook", "netflix"]) {
+const min = 810;
 
+for (let name of ["apple", "google", "microsoft", "amazon", "facebook", "netflix"]) {
+    const samples = db.reviews.aggregate([
+        {
+            $match: {
+                "company": name
+            }
+        }, {
+            $sample: {
+                size: min
+            }
+        },{
+            $project:{
+                "_id":0
+            }
+        }
+    ]).toArray();
+    db.undersampled.insertMany(samples);
 }

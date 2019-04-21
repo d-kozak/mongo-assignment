@@ -177,6 +177,32 @@ db.oversampled.insertMany(db.reviews.aggregate([
 ]).toArray());
 ```
 
+## 3) Undersampling
+Thanks to the fact that there is a sample aggregation operator, this task could be in a simple manner as you can see in the code below.
+
+```js
+const min = 810;
+
+for (let name of ["apple", "google", "microsoft", "amazon", "facebook", "netflix"]) {
+    const samples = db.reviews.aggregate([
+        {
+            $match: {
+                "company": name
+            }
+        }, {
+            $sample: {
+                size: min
+            }
+        },{
+            $project:{
+                "_id":0
+            }
+        }
+    ]).toArray();
+    db.undersampled.insertMany(samples);
+}
+```
+
 ## 4) Discretizing
 For the discretizing tasks I decided to convert the dates property. In the original collection, it contains dates in string format.
 Since for reviews their date is very important, I decided to discretize this column into values from the set {"CURRENT","OLD},
