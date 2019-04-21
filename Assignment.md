@@ -257,6 +257,34 @@ db.reviews.aggregate(
 db.probReviews.aggregate( [ {$group:{ "_id":"name",total: { $sum : "$probability"  }  }}])
 ```
 
+## 10) Remove noise
+For this task I decided to remove all the reviews that are older than 1.1.2018.
+This can be done using the following query. 
+```js
+db.reviews.aggregate([
+    {
+        $addFields: {
+            dates: {
+                $dateFromString: {
+                    dateString: "$dates", // convert to date object
+                    onError: new Date() // use very old date on error
+                }
+            }
+        }
+    },
+    {
+        $match: {
+            dates: {
+                $gte: ISODate("2018-01-01")
+            }
+        }
+    },
+    {
+        $out:"withoutNoise"
+    }
+]);
+```
+
 ## 11) Fill missing values
 First generate some nulls, since there were not any
 ```js
