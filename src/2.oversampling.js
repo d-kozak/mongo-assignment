@@ -1,5 +1,4 @@
-use
-reviews;
+use reviews;
 
 db.oversampled.deleteMany({});
 
