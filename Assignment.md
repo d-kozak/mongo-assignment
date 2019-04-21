@@ -72,6 +72,118 @@ db.reviews.aggregate(
 ```
 
 
+## 2) Oversampling
+For this task I decided to perform oversampling on the companies, because the distribution of reviews per company is uneven.
+This can be easily determined by executing the following query.
+```js
+db.reviews.aggregate([
+    {
+        $group: {
+            "_id": "$company",
+            count: {
+                $sum: 1
+            }
+        }
+    },
+    {
+        $out: "companyCount"
+    }
+]);
+```
+Which results in 
+```js
+ { "_id" : "apple", "count" : 12950 }
+ { "_id" : "google", "count" : 7819 }
+ { "_id" : "microsoft", "count" : 17930 }
+ { "_id" : "amazon", "count" : 26430 }
+ { "_id" : "facebook", "count" : 1590 }
+ { "_id" : "netflix", "count" : 810 }
+```
+Unfortunately the aggregation operator sample cannot oversample, therefore it was necessary to perform this task mostly using a javascript code.
+```js
+const necessarySamples = 26430;
+
+const apple = {
+    name: "apple",
+    reviewCount: 12950,
+};
+const google = {
+    name: "google",
+    reviewCount: 7819,
+};
+const microsoft = {
+    name: "microsoft",
+    reviewCount: 17930,
+};
+const amazon = {
+    name: "amazon",
+    reviewCount: 26430,
+};
+const facebook = {
+    name: "facebook",
+    reviewCount: 1590,
+};
+const netflix = {
+    name: "netflix",
+    reviewCount: 810,
+};
+
+for (let {name, reviewCount} of [apple, google, microsoft, facebook, netflix]) {
+    const steps = Math.floor(necessarySamples / reviewCount);
+    const lastIterationSamples = necessarySamples % reviewCount;
+
+    print(`Oversampling on ${name}, which requires full ${steps} iterations and ${lastIterationSamples} extra samples in the last round`);
+    for (let i = 0; i < steps; i++) {
+        const samples = db.reviews.aggregate([
+            {
+                $match: {
+                    "company": name
+                }
+            }, {
+                $project: {
+                    "_id": 0
+                }
+            }
+        ]).toArray();
+        db.oversampled.insertMany(samples);
+    }
+    const samples = db.reviews.aggregate([
+        {
+            $match: {
+                "company": name
+            }
+        },
+        {
+            $project: {
+                "_id": 0
+            }
+        },
+        {
+            $sample: {
+                size: lastIterationSamples
+            }
+        }
+    ]).toArray();
+    db.oversampled.insertMany(samples);
+}
+
+// add amazon
+db.oversampled.insertMany(db.reviews.aggregate([
+    {
+        $match:
+            {
+                company: "amazon"
+            }
+    },
+    {
+        $project: {
+            "_id":
+                0
+        }
+    }
+]).toArray());
+```
+
 ## 4) Discretizing
 For the discretizing tasks I decided to convert the dates property. In the original collection, it contains dates in string format.
 Since for reviews their date is very important, I decided to discretize this column into values from the set {"CURRENT","OLD},
