@@ -257,6 +257,81 @@ db.reviews.aggregate(
 db.probReviews.aggregate( [ {$group:{ "_id":"name",total: { $sum : "$probability"  }  }}])
 ```
 
+## 6) Tf-idf
+This was a challenging task. In the end, I ended up using map-reduce to perform it.
+I decided to calculate the importance of the word 'work'. First, I had to perform a precomputation
+to determine in how many reviews this word occurs.
+```js
+db.reviews.mapReduce(
+    function () {
+        emit(null, `${this.summary}`.indexOf(' work ') > 0 ? 1 : 0);
+    },
+    function (key, values) {
+        return Array.sum(values);
+    },
+    {
+        out: "wordStats"
+    }
+);
+```
+Than I grouped this information together with total document count and joined them with stats, creating new collection 
+withStats.
+```js
+db.wordStats.aggregate([
+    {
+        $project: {
+            "work": "$value",
+        }
+    },
+    {
+        $addFields: {
+            "totalDocs": 67529
+        }
+    },
+    {$out: "wordStats"}
+]);
+
+db.reviews.aggregate([
+    {
+        $lookup: {
+            from: "wordStats",
+            localField: "null",
+            foreignField: "null",
+            as: "stats"
+        }
+    },
+    {$out: "withStats"}
+]);
+```
+Afterwards, I could calculate the tf-idf using the following query.
+```js
+const map = function () {
+    const calcTf = (word, document) => {
+        const count = document.filter(elem => word === elem).length;
+        return count / document.length;
+    };
+    const stats = this.stats[0];
+    const tf = calcTf("work", `${this.summary}`.split(' '));
+    const idf = Math.log10(stats.totalDocs / stats.work);
+    const tfidf = tf * idf;
+    emit(this.id, {
+        summary: this.summary,
+        tfidf
+    })
+};
+
+db.withStats.mapReduce(
+    map,
+    function (key, values) {
+        throw new Error(`Should never be called, was called with key ${key} and values ${values}`)
+    },
+    {
+        out: "tfidf"
+    }
+);
+```
+
+
 ## 10) Remove noise
 For this task I decided to remove all the reviews that are older than 1.1.2018.
 This can be done using the following query. 
