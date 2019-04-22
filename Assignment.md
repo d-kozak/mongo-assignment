@@ -330,7 +330,30 @@ db.withStats.mapReduce(
     }
 );
 ```
-
+## 7) Index
+I decided to create an index over the summary field, since it contains the longest strings in the dataset.
+This task turned out to be fairly straightforward using map-reduce. It can be achieved using the following code.
+```js
+db.reviews.mapReduce(
+    function () {
+        for (let word of `${this.summary}`.split(/\s+/)) {
+            emit(word, {
+                documents: [this.id]
+            });
+        }
+    },
+    function (key, values) {
+        const documents = [];
+        for(let value of values){
+            documents.push(...value.documents)
+        }
+        return {
+            documents
+        }
+    },
+    "index"
+)
+```
 
 ## 10) Remove noise
 For this task I decided to remove all the reviews that are older than 1.1.2018.
