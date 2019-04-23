@@ -355,6 +355,24 @@ db.reviews.mapReduce(
 )
 ```
 
+## 9) Normalization
+For the normalization task I decided to normalize overall-ratings. In the original dataset, their values are from interval \[0,5\].
+I decided to normalize them to interval \[0,1\]. This can be achieved using the following query.
+```js
+db.reviews.aggregate([
+    {
+        $addFields:{
+            "overall-ratings":{
+                $divide:["$overall-ratings",5]
+            }
+        }
+    },
+    {
+        $out:"normalized"
+    }
+]);
+```
+
 ## 10) Remove noise
 For this task I decided to remove all the reviews that are older than 1.1.2018.
 This can be done using the following query. 
