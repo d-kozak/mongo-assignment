@@ -355,9 +355,72 @@ db.reviews.mapReduce(
 )
 ```
 
+## 8) Cross validation
+I decided to split the reviews into 5 datasets. Originally I wanted to use the $sample aggregation pipeline operator, but after some research I found it
+ill-fitting for two reasons. First of all, $sample does not guarantee to return unique results. On top of that, for generating K datasets, sample has to be run
+k times and there is no guarantee that there will be unique samples in each run, therefore the sets obtained by that approach won't be disjoint.
+
+That's why I decided to split the dataset using mapReduce in combination with random number generation.
+In each run of map, I generate a random integer from range \[0,k) and I use it as a key.
+Then in reduce, I merge all the results with same key into one list. This way I obtain a collection with ids from \[0,k\) 
+and values consisting of the subset of reviews that should be included in given dataset.  
+  
+```js
+const map = function () {
+    const k = 5;
+    const category = Math.floor(Math.random() * k);
+    emit(category, {
+        reviews: [this]
+    })
+};
+
+const reduce = function (key, values) {
+    const reviews = [];
+    for (let item of values) {
+        reviews.push(...item.reviews);
+    }
+    return {
+        reviews
+    }
+}
+
+db.reviews.mapReduce(
+    map,
+    reduce,
+    "cross_validation"
+)
+```  
+Afterwards I use aggregation pipeline to split the cross_validation collection into K subcollections, each containing one dataset. 
+```js
+for (let i = 0; i < K; i++) {
+    db.cross_validation.aggregate([
+        {
+            $match: {"_id": i}
+        },
+        {
+            $unwind: "$value.reviews"
+        },
+        {
+            $project: {
+                "review": "$value.reviews"
+            }
+        },
+        {
+            $project: {
+                "value": 0,
+                "_id": 0
+            }
+        },
+        {
+            $out: `cross_validation_${i}`
+        }
+    ]);
+}
+```
+
 ## 9) Normalization
 For the normalization task I decided to normalize overall-ratings. In the original dataset, their values are from interval \[0,5\].
-I decided to normalize them to interval \[0,1\]. This can be achieved using the following query.
+I decided to normalize them to interval \[0,1\]. This can be achieved using the following query.    
 ```js
 db.reviews.aggregate([
     {
