@@ -470,8 +470,7 @@ db.reviews.aggregate([
 ```
 
 ## 10) Remove noise
-For this task I decided to remove all the reviews that are older than 1.1.2018.
-This can be done using the following query. 
+For this task I decided to remove all the reviews that are older than 1.1.2018. The reason is the same as in the discretizing task. Older reviews are not so relevant. This can be done using the following query. 
 ```js
 db.reviews.aggregate([
     {

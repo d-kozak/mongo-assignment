@@ -1,4 +1,4 @@
-use reviews;
+db.withoutNoise.deleteMany({});
 
 db.reviews.aggregate([
     {
