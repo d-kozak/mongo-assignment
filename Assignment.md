@@ -6,7 +6,7 @@ This document describes the assignment for the subjest Scalable Methods of Data 
 As a data set, I choose [employee reviews](https://www.kaggle.com/petersunga/google-amazon-facebook-employee-reviews/version/2) of six tech companies, which I found 
 on [kaggle](https://kaggle.com). The reviews include Google, Facebook, Amazon, Microsoft, Apple and Netlix.
 
-The structure of one reviews is the following.
+The structure of one review is the following.
 ```js
 {
 	"_id" : ObjectId("5cb8472aef58eac9129de127"),
@@ -35,7 +35,14 @@ The first step is to import the dataset into Mongo. It can be downloaded as a cs
 ```
 mongoimport -d reviews -c reviews --type csv --file employee_reviews.csv --headerline
 ```
-It will import the csv file into database reviews as a collection reviews
+It will import the csv file into database reviews as a collection reviews.
+
+## Run the code
+To run the code, you must select a mongo database server on which you want to run it and also specify the review database in the database server. The source code expects reviews collection to be there and have the structure described above.
+
+```
+mongo localhost:27017/reviews  fileToRun.js
+```
 
 ## 1) Lookup table
 

@@ -1,5 +1,3 @@
-use reviews;
-
 db.oversampled.deleteMany({});
 
 db.reviews.aggregate([
@@ -22,7 +20,7 @@ db.reviews.aggregate([
 //     { "_id" : "netflix", "count" : 810 }
 
 
-// unfortunately, not mongo operator to oversample, has to be done manually
+// unfortunately, no mongo operator to oversample, has to be done manually
 const necessarySamples = 26430;
 
 const apple = {
@@ -89,7 +87,7 @@ for (let {name, reviewCount} of [apple, google, microsoft, facebook, netflix]) {
     db.oversampled.insertMany(samples);
 }
 
-// add amazon
+// add amazon, there is no need to oversample it, since it has the most reviews.
 db.oversampled.insertMany(db.reviews.aggregate([
     {
         $match:

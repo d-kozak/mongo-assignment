@@ -1,6 +1,7 @@
-/**
- * Lookup collection task
- */
+db.companies.deleteMany({});
+db.reviewsForLookup.deleteMany({});
+
+
 db.reviews.aggregate(
     [
         {
