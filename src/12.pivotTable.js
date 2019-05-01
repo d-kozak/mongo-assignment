@@ -1,4 +1,4 @@
-use reviews;
+db.pivot.deleteMany({});
 
 db.reviews.aggregate([
     {
