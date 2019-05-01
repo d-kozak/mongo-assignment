@@ -73,7 +73,7 @@ db.reviews.aggregate(
     ]
 )
 ```
-Then it is necessary to create a modified version of the reveiws. First, the review and company are merged using the lookup operation. Then the company string is replaced with corresponding id from the companies collection.
+Then it is necessary to create a modified version of the reviews. First, the review and company are merged using the lookup operation. Then the company string is replaced with corresponding id from the companies collection.
 ```js
 db.reviews.aggregate(
     [
@@ -212,7 +212,7 @@ db.oversampled.insertMany(db.reviews.aggregate([
 ```
 
 ## 3) Undersampling
-Thanks to the fact that there is a sample aggregation operator, this task could be in a simple manner as you can see in the code below. I decided to undersample to 810 reviews per company, since it is the lowest amount per company in the original collection.
+Thanks to the fact that there is a sample aggregation operator, this task could be done in a simple manner as you can see in the code below. I decided to undersample to 810 reviews per company, since it is the lowest amount per company in the original collection.
 ```js
 const min = 810;
 
@@ -291,7 +291,7 @@ db.probReviews.aggregate( [ {$group:{ "_id":"name",total: { $sum : "$probability
 ```
 
 ## 6) Tf-idf
-This was a challenging task. In the end, I ended up using map-reduce to perform it.
+This was a challenging task. In the end, I ended up using MapReduce to perform it.
 I decided to calculate the importance of the word 'work'. First, I had to perform a precomputation
 to determine in how many reviews this word occurs.
 ```js
@@ -365,7 +365,7 @@ db.withStats.mapReduce(
 ```
 ## 7) Index
 I decided to create an index over the summary field, since it contains the longest strings in the dataset.
-This task turned out to be fairly straightforward using map-reduce. It can be achieved using the following code.
+This task turned out to be fairly straightforward using MapReduce. It can be achieved using the following code.
 ```js
 db.reviews.mapReduce(
     function () {
@@ -393,7 +393,7 @@ I decided to split the reviews into 5 datasets. Originally I wanted to use the $
 ill-fitting for two reasons. First of all, $sample does not guarantee to return unique results. On top of that, for generating K datasets, sample has to be run
 k times and there is no guarantee that there will be unique samples in each run, therefore the sets obtained by that approach won't be disjoint.
 
-That's why I decided to split the dataset using mapReduce in combination with random number generation.
+That's why I decided to split the dataset using MapReduce in combination with random number generation.
 In each run of map, I generate a random integer from range \[0,k) and I use it as a key.
 Then in reduce, I merge all the results with same key into one list. This way I obtain a collection with ids from \[0,k\) 
 and values consisting of the subset of reviews that should be included in given dataset.  
