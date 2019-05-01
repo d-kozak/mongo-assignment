@@ -1,4 +1,8 @@
 
+db.tfidf.deleteMany({});
+db.wordStats.deleteMany({});
+db.withStats.deleteMany({});
+
 load("preparations.js");
 const map = function () {
     const calcTf = (word, document) => {

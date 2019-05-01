@@ -238,7 +238,7 @@ for (let name of ["apple", "google", "microsoft", "amazon", "facebook", "netflix
 
 ## 4) Discretizing
 For the discretizing tasks I decided to convert the dates property. In the original collection, it contains dates in string format.
-Since for reviews their date is very important, I decided to discretize this column into values from the set {"CURRENT","OLD},
+Since for reviews their date is very important, I decided to discretize this column into values from the set {"CURRENT","OLD"},
 where all the reviews that are older than 1.1.2017 are considered old. It is better to read the newer ones, because they can give you a more accurate insight into the current situation.
 ```js
 db.reviews.aggregate([{
