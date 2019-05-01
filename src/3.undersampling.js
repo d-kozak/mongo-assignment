@@ -1,4 +1,3 @@
-use reviews;
 //     { "_id" : "apple", "count" : 12950 }
 //     { "_id" : "google", "count" : 7819 }
 //     { "_id" : "microsoft", "count" : 17930 }

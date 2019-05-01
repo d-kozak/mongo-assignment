@@ -212,8 +212,7 @@ db.oversampled.insertMany(db.reviews.aggregate([
 ```
 
 ## 3) Undersampling
-Thanks to the fact that there is a sample aggregation operator, this task could be in a simple manner as you can see in the code below.
-
+Thanks to the fact that there is a sample aggregation operator, this task could be in a simple manner as you can see in the code below. I decided to undersample to 810 reviews per company, since it is the lowest amount per company in the original collection.
 ```js
 const min = 810;
 
