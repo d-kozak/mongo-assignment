@@ -1,5 +1,5 @@
 /**
- * Lookup table task
+ * Lookup collection task
  */
 db.reviews.aggregate(
     [
@@ -46,7 +46,12 @@ db.reviews.aggregate(
                 }
         },
         {
-            $out: "reviews2" // save into new collection, just to be save
+            $project:{
+                others:0 // remove the joined table
+            }
+        },
+        {
+            $out: "reviewsForLookup" // save into new collection, just to be save
         }
     ]
 )

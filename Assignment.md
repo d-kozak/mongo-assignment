@@ -1,23 +1,45 @@
 # Assignment to the subject Scalable Methods of Data Analysis
 
+This document describes the assignment for the subjest Scalable Methods of Data Analysis. The goal is to implement 10 operations in mongodb.
+
 ## Source
-As a data set, I choose [reviews](https://www.kaggle.com/petersunga/google-amazon-facebook-employee-reviews/version/2) of five tech companies, which I found 
-on [kaggle](https://kaggle.com) 
+As a data set, I choose [employee reviews](https://www.kaggle.com/petersunga/google-amazon-facebook-employee-reviews/version/2) of six tech companies, which I found 
+on [kaggle](https://kaggle.com). The reviews include Google, Facebook, Amazon, Microsoft, Apple and Netlix.
+
+The structure of one reviews is the following.
+```js
+{
+	"_id" : ObjectId("5cb8472aef58eac9129de127"),
+	"id" : 1,
+	"company" : "google",
+	"location" : "none",
+	"dates" : " Dec 11, 2018",
+	"job-title" : "Current Employee - Anonymous Employee",
+	"summary" : "Best Company to work for",
+	"pros" : "People are smart and friendly",
+	"cons" : "Bureaucracy is slowing things down",
+	"advice-to-mgmt" : "none",
+	"overall-ratings" : 5,
+	"work-balance-stars" : 4,
+	"culture-values-stars" : 5,
+	"carrer-opportunities-stars" : 5,
+	"comp-benefit-stars" : 4,
+	"senior-mangemnet-stars" : 5,
+	"helpful-count" : 0,
+	"link" : "https://www.glassdoor.com/Reviews/Google-Reviews-E9079_P1.htm"
+}
+```
 
 ## Import into mongo
-This dataset can be downloaded as a csv file, the command for importing it is
+The first step is to import the dataset into Mongo. It can be downloaded as a csv file. Since the first column did not have a name in the csv file, which resulted in a document property with empty name, it is necessary to add the "id" to it before import. The command for importing the modified csv file is the following.
 ```
 mongoimport -d reviews -c reviews --type csv --file employee_reviews.csv --headerline
 ```
-This command will import the csv file into database reviews as a collection reviews
-
-Note: Since the first column did not have a name in the csv file, which resulted in a document property with empty name, I added a name "id" to it before import
-This id was used in the first task of creating a lookup table.
-
+It will import the csv file into database reviews as a collection reviews
 
 ## 1) Lookup table
 
-First create the lookup table
+The goal of this task was to create a lookup collection. I decided to create a new collection companies, which maps integer ids to company names. It can be done using the following command.
 ```js
 db.reviews.aggregate(
     [
@@ -44,7 +66,7 @@ db.reviews.aggregate(
     ]
 )
 ```
-Then join these two tables and replace the company value in the first
+Then it is necessary to create a modified version of the reveiws. First, the review and company are merged using the lookup operation. Then the company string is replaced with corresponding id from the companies collection.
 ```js
 db.reviews.aggregate(
     [
@@ -65,7 +87,12 @@ db.reviews.aggregate(
                 }
         },
         {
-                    $out: "reviews2" // save into new collection, just to be save
+            $project:{
+                others:0 // remove the joined table
+            }
+        },
+        {
+            $out: "reviewsForLookup" // save into new collection
         }
     ]
 )
