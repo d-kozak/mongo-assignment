@@ -550,7 +550,7 @@ db.nulledReviews.aggregate(
 ```
 
 ## 12) Pivot table
-For this tasks I decided to calculate the average, rating per company in 
+For this tasks I decided to calculate the average rating per company in 
 * overall-ratings
 * work-balance-stars
 * culture-values-stars
