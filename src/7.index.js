@@ -1,3 +1,5 @@
+db.index.deleteMany({});
+
 db.reviews.mapReduce(
     function () {
         for (let word of `${this.summary}`.split(/\s+/)) {
