@@ -1,3 +1,4 @@
+db.normalized.deleteMany({});
 
 db.reviews.aggregate([
     {
