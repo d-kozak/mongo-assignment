@@ -1,3 +1,7 @@
+db.nulledReviews.deleteMany({});
+db.averageRating.deleteMany({});
+db.notNullReviews.deleteMany({});
+
 // First generate some nulls, since there were not any
 db.reviews.aggregate(
     [

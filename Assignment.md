@@ -497,7 +497,7 @@ db.reviews.aggregate([
 ```
 
 ## 11) Fill missing values
-First generate some nulls, since there were not any
+This task turned out to be a bit problematic, because there were no missing values in the original dataset. Therefore  as a first step I had to insert some "artifical nulls". I decided to remove the overall-ratings for every fifth review.
 ```js
 db.reviews.aggregate(
     [
@@ -514,7 +514,7 @@ db.reviews.aggregate(
     ]
 );
 ```
-count the average overall rating
+Then I computed the average rating.
 ```js
 db.reviews.aggregate(
     [
@@ -532,12 +532,10 @@ db.reviews.aggregate(
     ]
 );
 ```
+And finally inserted the average value where the overall-ratings is null
+```js
 // extract it
-```js
 const average = db.averageRating.findOne().average;
-```
-Finally insert the average value where the overall-ratings is null
-```js
 db.nulledReviews.aggregate(
     [
         {
