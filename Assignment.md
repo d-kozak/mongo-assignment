@@ -239,7 +239,7 @@ for (let name of ["apple", "google", "microsoft", "amazon", "facebook", "netflix
 ## 4) Discretizing
 For the discretizing tasks I decided to convert the dates property. In the original collection, it contains dates in string format.
 Since for reviews their date is very important, I decided to discretize this column into values from the set {"CURRENT","OLD},
-where all the reviews that are older than 1.1.2017 are considered old.
+where all the reviews that are older than 1.1.2017 are considered old. It is better to read the newer ones, because they can give you a more accurate insight into the current situation.
 ```js
 db.reviews.aggregate([{
         $addFields: {
@@ -265,7 +265,7 @@ db.reviews.aggregate([{
 ```
 
 ## 5) Probability analysis
-I decided to analyze is what is the probability of each review to belong to a specific company.
+I decided to analyze is what is the probability of each review belonging to a specific company.
 ```js
 db.reviews.aggregate(
     [

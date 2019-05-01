@@ -1,3 +1,5 @@
+db.discretizedReviews.deleteMany({});
+
 db.reviews.aggregate([{
         $addFields: {
             dates: {
@@ -15,7 +17,7 @@ db.reviews.aggregate([{
         }
     },
         {
-            $out: "modifiedReviews"
+            $out: "discretizedReviews"
         }
     ]
 );

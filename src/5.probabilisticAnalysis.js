@@ -1,3 +1,5 @@
+db.probReviews.deleteMany({});
+
 db.reviews.aggregate(
     [
         {
